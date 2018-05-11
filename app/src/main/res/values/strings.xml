@@ -1,32 +1,8 @@
 <resources>
-    <string name="app_name">Firebase Authentication</string>
-
-    <string name="label_google_sign_in">Firebase + Google Sign In</string>
-    <string name="desc_google_sign_in">Use a Google Sign In credential to authenticate with Firebase.</string>
-
-    <string name="label_facebook_login">Firebase + Facebook Login</string>
-    <string name="desc_facebook_login">Use a Facebook Login credential to authenticate with Firebase.</string>
-
-    <string name="label_twitter_login">Firebase + Twitter Login</string>
-    <string name="desc_twitter_login">Use a Twitter Login credential to authenticate with Firebase.</string>
+    <string name="app_name">Delivery On Time - Enterprise</string>
 
     <string name="label_emailpassword">Email/Password Authentication</string>
     <string name="desc_emailpassword">Use an email and password to authenticate with Firebase.</string>
-
-    <string name="label_passwordless">Passwordless Authentication</string>
-    <string name="desc_passwordless">Use only an email to authenticate with Firebase.</string>
-
-    <string name="label_phone_auth">Phone Number Authentication</string>
-    <string name="desc_phone_auth">Use a phone number to authenticate with Firebase.</string>
-
-    <string name="label_anonymous_auth">Anonymous Authentication</string>
-    <string name="desc_anonymous_auth">Sign in anonymously and then later upgrade to a full Firebase Auth user.</string>
-
-    <string name="label_custom_auth">Custom Authentication</string>
-    <string name="desc_custom_auth">Use a custom token signed by your own server to authenticate with Firebase.</string>
-
-    <string name="label_firebase_ui">FirebaseUI Auth</string>
-    <string name="desc_firebase_ui">Use the FirebaseUI-Android library to authenticate with Firebase.</string>
 
     <string name="hint_user_id">User ID</string>
     <string name="get_custom_token">Get Token</string>
@@ -88,4 +64,18 @@
     <string name="navigate_to_menu">Ir al menú</string>
     <string name="title_activity_routes">Map</string>
 
+    <!-- START: MAIN MENU -->
+    <string name="title_activity_main_menu">MainMenuActivity</string>
+    <string name="tab_text_1">Clientes</string>
+    <string name="tab_text_2">Rutas</string>
+    <string name="tab_text_3">Repartidores</string>
+    <string name="tab_text_4">Mensajería</string>
+    <string name="tab_text_5">Valoraciones</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <!-- END: MAIN MENU -->
+
+    <!-- START: ROUTES -->
+    <string name="routes_selection_header">Seleccione una ruta</string>
+    <!-- END: ROUTES -->
 </resources>

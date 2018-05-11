@@ -120,6 +120,11 @@ public class MainMenuActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+
+            if (this.getArguments().getInt(ARG_SECTION_NUMBER) == 2) {
+                return inflater.inflate(R.layout.fragment_routes, container, false);
+            }
+
             View rootView = inflater.inflate(R.layout.fragment_main_menu, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
@@ -141,6 +146,9 @@ public class MainMenuActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+            if (position == 1) {
+                return new RoutesFragment();
+            }
             return PlaceholderFragment.newInstance(position + 1);
         }
 
