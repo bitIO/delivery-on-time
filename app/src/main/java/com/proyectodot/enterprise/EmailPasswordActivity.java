@@ -16,6 +16,7 @@
 
 package com.proyectodot.enterprise;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -61,6 +62,7 @@ public class EmailPasswordActivity extends BaseActivity implements
         // findViewById(R.id.email_create_account_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
         findViewById(R.id.verify_email_button).setOnClickListener(this);
+        findViewById(R.id.navigate_to_menu).setOnClickListener(this);
 
         // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
@@ -240,6 +242,8 @@ public class EmailPasswordActivity extends BaseActivity implements
             signOut();
         } else if (i == R.id.verify_email_button) {
             sendEmailVerification();
+        } else if (i == R.id.navigate_to_menu) {
+            startActivity(new Intent(this, MainMenuActivity.class));
         }
     }
 }
