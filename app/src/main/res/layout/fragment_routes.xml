@@ -12,13 +12,16 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1.0"
+        android:weightSum="1"
         android:orientation="vertical"
-        android:weightSum="1.0">
+        android:background="@color/colorAccent">
 
         <com.google.android.gms.maps.MapView
             android:id="@+id/map"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="0dp"
+            android:layout_weight=".75" />
+
     </LinearLayout>
 
     <LinearLayout

@@ -32,6 +32,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Locale;
+
 public class EmailPasswordActivity extends BaseActivity implements
         View.OnClickListener {
 
@@ -67,6 +69,8 @@ public class EmailPasswordActivity extends BaseActivity implements
         // [START initialize_auth]
         mAuth = FirebaseAuth.getInstance();
         // [END initialize_auth]
+
+        Locale.setDefault(new Locale("es"));
     }
 
     // [START on_start_check_user]

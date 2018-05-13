@@ -1,5 +1,7 @@
 package com.proyectodot.enterprise;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
@@ -16,22 +18,40 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.maps.DirectionsApi;
+import com.google.maps.GeoApiContext;
+import com.google.maps.android.PolyUtil;
+import com.google.maps.errors.ApiException;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.DirectionsStep;
+import com.google.maps.model.TravelMode;
 import com.woxthebox.draglistview.DragItemAdapter;
 import com.woxthebox.draglistview.DragListView;
 
+import org.joda.time.DateTime;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class RoutesFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
 
+    private static final int overview = 0;
+
     GoogleMap mGoogleMap;
     MapView mMapView;
     View mView;
+
 
     // form create route
     TextView tRouteName;
@@ -87,15 +107,18 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        MapsInitializer.initialize(getContext());
         mGoogleMap = googleMap;
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        googleMap.addMarker(
+
+        // MapsInitializer.initialize(getContext());
+        setupGoogleMapScreenSettings(mGoogleMap);
+        mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mGoogleMap.addMarker(
           new MarkerOptions()
                   .position(new LatLng(40.2959197, -3.8309136))
                   .title("Casa")
                   .snippet("Aquí vivo yo")
         );
+
         CameraPosition home = CameraPosition.builder()
                 .target(new LatLng(40.2959197, -3.8309136))
                 .zoom(16)
@@ -113,16 +136,25 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         Log.d("DOT", "AddToRouteId: " + R.id.buttonAddToRoute);
         switch (buttonId) {
             case R.id.buttonAddToRoute:
-                Log.d("DOT", "Adding address to route");
-                String address = tAddress.getText().toString();
-                String city = tCity.getText().toString();
-                String province = tProvince.getText().toString();
-                RouteWayPoint rwp = new RouteWayPoint(address, city, province);
-                adapter.addItem(
-                        adapter.getItemCount(),
-                        new Pair<>(System.currentTimeMillis(), rwp.toString())
-                );
-                mRouteWayPoints.add(rwp);
+//                Log.d("DOT", "Adding address to route");
+//                String address = tAddress.getText().toString();
+//                String city = tCity.getText().toString();
+//                String province = tProvince.getText().toString();
+//                RouteWayPoint rwp = new RouteWayPoint(address, city, province);
+//                adapter.addItem(
+//                        adapter.getItemCount(),
+//                        new Pair<>(System.currentTimeMillis(), rwp.toString())
+//                );
+//                mRouteWayPoints.add(rwp);
+                if (adapter.getItemCount() >= 2) {
+                    mGoogleMap.clear();
+                    DirectionsResult results = getDirectionsDetails(mRouteWayPoints, TravelMode.DRIVING);
+                    if (results != null) {
+                        addPolyline(results, mGoogleMap);
+                        positionCamera(results.routes[overview], mGoogleMap);
+                        addMarkersToMap(results, mGoogleMap);
+                    }
+                }
                 break;
 
             case R.id.buttonSaveRoute:
@@ -166,5 +198,138 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         DragItemAdapter listAdapter = new ItemAdapter(new ArrayList<>(), R.layout.list_item, R.id.image, true);
         lRouteWayPoints.setAdapter(listAdapter, false);
         lRouteWayPoints.setCanDragHorizontally(true);
+
+        RouteWayPoint rwp1 = new RouteWayPoint("Avenida de Carlos V 3", "Mostoles", "Madrid");
+        RouteWayPoint rwp2 = new RouteWayPoint("Simon Hernandez 1", "Mostoles", "Madrid");
+        RouteWayPoint rwp3 = new RouteWayPoint("Luis Sauquillo 3", "Fuenlabdrada", "Madrid");
+        RouteWayPoint rwp4 = new RouteWayPoint("Urbanizacion Nuevo Versalles 30", "Fuenlabdrada", "Madrid");
+
+        DragItemAdapter adapter = lRouteWayPoints.getAdapter();
+        adapter.addItem(
+                adapter.getItemCount(),
+                new Pair<>(System.currentTimeMillis(), rwp1.toString())
+        );
+        mRouteWayPoints.add(rwp1);
+        adapter.addItem(
+                adapter.getItemCount(),
+                new Pair<>(System.currentTimeMillis(), rwp2.toString())
+        );
+        mRouteWayPoints.add(rwp2);
+        adapter.addItem(
+                adapter.getItemCount(),
+                new Pair<>(System.currentTimeMillis(), rwp3.toString())
+        );
+        mRouteWayPoints.add(rwp3);
+        adapter.addItem(
+                adapter.getItemCount(),
+                new Pair<>(System.currentTimeMillis(), rwp4.toString())
+        );
+        mRouteWayPoints.add(rwp4);
+
+
+    }
+
+    private DirectionsResult getDirectionsDetails(ArrayList<RouteWayPoint> route, TravelMode mode) {
+        DateTime now = new DateTime();
+        StringBuilder waypointsBuilder = new StringBuilder();
+        String SEPARATOR = "|";
+        int routes = route.size();
+        for (int i = 1; i < routes - 1; i++) {
+            waypointsBuilder.append(route.get(i).toString());
+            if (i < routes - 2) {
+                waypointsBuilder.append(SEPARATOR);
+            }
+        }
+        try {
+            Log.d("DOT", "Requesting directions");
+            Log.d("DOT", "Origin: " + mRouteWayPoints.get(0).toString());
+            Log.d("DOT", "Destination: " + mRouteWayPoints.get(routes - 1).toString());
+            Log.d("DOT", "Waypoints: " + waypointsBuilder.toString());
+
+            return DirectionsApi
+                    .newRequest(getGeoContext())
+                    .mode(mode)
+                    .origin(mRouteWayPoints.get(0).toString())
+                    .destination(route.get(routes - 1).toString())
+                    .waypoints(waypointsBuilder.toString())
+                    .departureTime(now)
+                    .await();
+        } catch (ApiException e) {
+            e.printStackTrace();
+            return null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
+//        mMap.addMarker(new MarkerOptions().position(
+//                new LatLng(
+//                        results.routes[overview].legs[overview].startLocation.lat,
+//                        results.routes[overview].legs[overview].startLocation.lng
+//                )
+//        ).title(results.routes[overview].legs[overview].startAddress));
+
+        Geocoder gCoder = new Geocoder(getContext());
+        for (int i = 0; i < mRouteWayPoints.size(); i++) {
+            try {
+                Log.d("DOT", "Añadiendo marcador: " + i);
+                Log.d("DOT", mRouteWayPoints.get(i).toString());
+                Address address = gCoder.getFromLocationName(mRouteWayPoints.get(i).toString(), 1).get(0);
+                mMap.addMarker(new MarkerOptions().position(new LatLng(address.getLatitude(), address.getLongitude())));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+//        mMap.addMarker(new MarkerOptions().position(
+//                new LatLng(
+//                        results.routes[overview].legs[overview].endLocation.lat,
+//                        results.routes[overview].legs[overview].endLocation.lng)
+//        ).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
+    }
+
+    private void positionCamera(DirectionsRoute route, GoogleMap mMap) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 12));
+    }
+
+    private void addPolyline(DirectionsResult results, GoogleMap mMap) {
+        List<LatLng> decodedPath = PolyUtil.decode(results.routes[overview].overviewPolyline.getEncodedPath());
+        mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(getContext().getResources().getColor(R.color.colorPrimary)));
+    }
+
+    private String getEndLocationTitle(DirectionsResult results){
+        return  "Time :"+ results.routes[overview].legs[overview].duration.humanReadable + " Distance :" + results.routes[overview].legs[overview].distance.humanReadable;
+    }
+
+    private GeoApiContext getGeoContext() {
+        return new GeoApiContext
+                .Builder()
+                .queryRateLimit(3)
+                .connectTimeout(1, TimeUnit.SECONDS)
+                .readTimeout(1, TimeUnit.SECONDS)
+                .writeTimeout(1, TimeUnit.SECONDS)
+                .apiKey(getString(R.string.google_directions_key))
+                .build();
+
+    }
+
+    private void setupGoogleMapScreenSettings(GoogleMap mMap) {
+        mMap.setBuildingsEnabled(false);
+        mMap.setIndoorEnabled(false);
+        mMap.setTrafficEnabled(true);
+
+        UiSettings mUiSettings = mMap.getUiSettings();
+        mUiSettings.setZoomControlsEnabled(true);
+        mUiSettings.setCompassEnabled(true);
+        mUiSettings.setMyLocationButtonEnabled(true);
+        mUiSettings.setScrollGesturesEnabled(true);
+        mUiSettings.setZoomGesturesEnabled(true);
+        mUiSettings.setTiltGesturesEnabled(false);
+        mUiSettings.setRotateGesturesEnabled(true);
     }
 }
