@@ -77,5 +77,14 @@
 
     <!-- START: ROUTES -->
     <string name="routes_selection_header">Seleccione una ruta</string>
+    <string name="routes_button_show_list">Listado de rutas</string>
+    <string name="routes_button_create">Nueva ruta</string>
+    <string name="routes_form_create_header">Creación de nueva ruta</string>
+    <string name="routes_form_create_input_name">Nombre de la ruta</string>
+    <string name="routes_form_create_input_address">Dirección</string>
+    <string name="routes_form_create_input_city">Ciudad</string>
+    <string name="routes_form_create_input_province">Provincia</string>
+    <string name="routes_form_create_save_address">Añadir a ruta</string>
+    <string name="routes_form_create_save">Guardar ruta</string>
     <!-- END: ROUTES -->
 </resources>
