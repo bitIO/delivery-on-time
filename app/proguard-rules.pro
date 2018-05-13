@@ -35,3 +35,4 @@
 -keepclasseswithmembers class * {
     @retrofit.http.* <methods>;
 }
+-keep class com.woxthebox.draglistview.** { *; }
