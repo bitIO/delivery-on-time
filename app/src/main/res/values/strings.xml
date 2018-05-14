@@ -79,6 +79,9 @@
     <string name="routes_selection_header">Seleccione una ruta</string>
     <string name="routes_button_show_list">Listado de rutas</string>
     <string name="routes_button_create">Nueva ruta</string>
+
+    <string name="routes_list_search">Busqueda por nombre</string>
+
     <string name="routes_form_create_header">Creación de nueva ruta</string>
     <string name="routes_form_create_input_name">Nombre de la ruta</string>
     <string name="routes_form_create_input_address">Dirección</string>

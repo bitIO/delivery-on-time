@@ -55,83 +55,117 @@
         </LinearLayout>
 
         <ScrollView
+            android:id="@+id/routesListScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="visible">
 
-                <LinearLayout
-                    android:id="@+id/routesFormCreate"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:orientation="vertical"
-                    android:visibility="gone">
+                    android:hint="@string/routes_list_search" />
 
-                    <TextView
-                        android:id="@+id/formCreateRouteHeader"
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.woxthebox.draglistview.DragListView
+                        android:id="@+id/dragListAvailableRoutes"
+                        android:scrollbars="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/routes_form_create_header" />
+                        android:layout_height="match_parent" />
 
-                    <EditText
-                        android:id="@+id/editTextName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:hint="@string/routes_form_create_input_name"
-                        android:inputType="textPersonName" />
+                </ScrollView>
 
-                    <View style="@style/Divider" />
+            </LinearLayout>
 
-                    <EditText
-                        android:id="@+id/editTextAddress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:hint="@string/routes_form_create_input_address"
-                        android:inputType="textPersonName" />
+        </ScrollView>
 
-                    <EditText
-                        android:id="@+id/editTextCity"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:hint="@string/routes_form_create_input_city"
-                        android:inputType="textPersonName" />
 
-                    <EditText
-                        android:id="@+id/editTextProvince"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:hint="@string/routes_form_create_input_province"
-                        android:inputType="textPersonName" />
+        <ScrollView
+            android:id="@+id/routesFormCreate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
 
-                    <Button
-                        android:id="@+id/buttonAddToRoute"
-                        style="@style/Widget.AppCompat.Button.Colored"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/routes_form_create_save_address" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:orientation="vertical">
 
-                    <ScrollView
+                <TextView
+                    android:id="@+id/formCreateRouteHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/routes_form_create_header" />
+
+                <EditText
+                    android:id="@+id/editTextName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/routes_form_create_input_name"
+                    android:inputType="textPersonName" />
+
+                <View style="@style/Divider" />
+
+                <EditText
+                    android:id="@+id/editTextAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/routes_form_create_input_address"
+                    android:inputType="textPersonName" />
+
+                <EditText
+                    android:id="@+id/editTextCity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/routes_form_create_input_city"
+                    android:inputType="textPersonName" />
+
+                <EditText
+                    android:id="@+id/editTextProvince"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/routes_form_create_input_province"
+                    android:inputType="textPersonName" />
+
+                <Button
+                    android:id="@+id/buttonAddToRoute"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/routes_form_create_save_address" />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.woxthebox.draglistview.DragListView
+                        android:id="@+id/dragListRouteItems"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <com.woxthebox.draglistview.DragListView
-                            android:id="@+id/dragListRouteItems"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                    </com.woxthebox.draglistview.DragListView>
+                </ScrollView>
 
-                        </com.woxthebox.draglistview.DragListView>
-                    </ScrollView>
-
-                    <Button
-                        android:id="@+id/buttonSaveRoute"
-                        style="@style/Widget.AppCompat.Button.Colored"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/routes_form_create_save" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/buttonSaveRoute"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/routes_form_create_save" />
+            </LinearLayout>
 
         </ScrollView>
 

@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,8 +27,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.android.PolyUtil;
@@ -42,6 +47,7 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -50,13 +56,20 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
 
     private static final int overview = 0;
 
+    FirebaseDatabase database;
+    DatabaseReference firebaseData;
+
+    // Map
     GoogleMap mGoogleMap;
     MapView mMapView;
     View mView;
 
+    // List
+    private ScrollView lRoutesListScrollView;
+    private DragListView lAvailableRoutes;
 
     // form create route
-    LinearLayout lRoutesFormCreate;
+    ScrollView lRoutesFormCreate;
     TextView tRouteName;
     TextView tAddress;
     TextView tCity;
@@ -66,6 +79,7 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
     Button bButtonSaveRoute;
 
     Route currentRoute;
+    ArrayList<Route> availableRoutes;
 
     public RoutesFragment() {
         // Required empty public constructor
@@ -88,6 +102,9 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        database = FirebaseDatabase.getInstance();
+        firebaseData = database.getReference("routes/");
+
         // map
         mMapView = mView.findViewById(R.id.map);
         Log.d("DOT", "mMapView is null? " + (mMapView == null));
@@ -104,11 +121,14 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         tCity= view.findViewById(R.id.editTextCity);
         tProvince= view.findViewById(R.id.editTextProvince);
         bButtonSaveRoute = view.findViewById(R.id.buttonSaveRoute);
-
         lRouteWayPoints = view.findViewById(R.id.dragListRouteItems);
+        lAvailableRoutes= view.findViewById(R.id.dragListAvailableRoutes);
+        lRoutesListScrollView = view.findViewById(R.id.routesListScrollView);
+
         initDragList();
 
         // listeners
+        view.findViewById(R.id.buttonListRoutes).setOnClickListener(this);
         view.findViewById(R.id.buttonNewRoute).setOnClickListener(this);
         view.findViewById(R.id.buttonAddToRoute).setOnClickListener(this);
         view.findViewById(R.id.buttonSaveRoute).setOnClickListener(this);
@@ -140,22 +160,50 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
     @Override
     public void onClick(View v) {
         int buttonId = v.getId();
-        DragItemAdapter adapter = lRouteWayPoints.getAdapter();
+
         Log.d("DOT", "Clicked on view: " + buttonId);
         Log.d("DOT", "AddToRouteId: " + R.id.buttonAddToRoute);
         switch (buttonId) {
+            case R.id.buttonListRoutes:
+                lRoutesListScrollView.setVisibility(View.VISIBLE);
+                firebaseData.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // get total available quest
+                        long size = dataSnapshot.getChildrenCount();
+                        DragItemAdapter availableRoutesAdapter = lAvailableRoutes.getAdapter();
+                        ((RouteItemAdapter)availableRoutesAdapter).setGoogleMap(mGoogleMap);
+
+                        while(availableRoutesAdapter != null && availableRoutesAdapter.getItemCount() > 0) {
+                            availableRoutesAdapter.removeItem(0);
+                        }
+                        availableRoutes = new ArrayList<>();
+                        int i = 0;
+                        for (Iterator it = dataSnapshot.getChildren().iterator(); it.hasNext(); i++) {
+                            Route r = Route.parse((DataSnapshot) it.next());
+                            availableRoutesAdapter.addItem(i, new Pair<>(System.currentTimeMillis(), r));
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                break;
+
             case R.id.buttonAddToRoute:
                 Log.d("DOT", "Adding address to route");
+                DragItemAdapter routesAdapter = lRouteWayPoints.getAdapter();
                 String address = tAddress.getText().toString();
                 String city = tCity.getText().toString();
                 String province = tProvince.getText().toString();
                 RouteWayPoint rwp = new RouteWayPoint(address, city, province);
-                adapter.addItem(
-                        adapter.getItemCount(),
+                routesAdapter.addItem(
+                        routesAdapter.getItemCount(),
                         new Pair<>(System.currentTimeMillis(), rwp.toString())
                 );
                 mRouteWayPoints.add(rwp);
-                if (adapter.getItemCount() >= 2) {
+                if (routesAdapter.getItemCount() >= 2) {
                     mGoogleMap.clear();
                     DirectionsResult results = getDirectionsDetails(mRouteWayPoints, TravelMode.DRIVING);
                     if (results != null) {
@@ -174,16 +222,16 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
 
             case R.id.buttonSaveRoute:
                 Log.d("DOT", "Saving route");
-                if (adapter.getItemCount() == 0) {
+                DragItemAdapter routeAdapter = lRouteWayPoints.getAdapter();
+                if (routeAdapter.getItemCount() == 0) {
                     Toast.makeText(v.getContext(), "😅 La ruta esta vacia", Toast.LENGTH_LONG).show();
                 }
                 currentRoute.setName(tRouteName.getText().toString());
                 currentRoute.setWaypoints(mRouteWayPoints);
 
                 // Write a message to the database
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference firebaseData = database.getReference("routes/").push();
-                firebaseData.setValue(currentRoute);
+                DatabaseReference newRoute = database.getReference("routes/").push();
+                newRoute.setValue(currentRoute);
 
                 resetRouteCreation();
                 Toast.makeText(
@@ -225,7 +273,13 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         lRouteWayPoints.setLayoutManager(new LinearLayoutManager(getActivity()));
         DragItemAdapter listAdapter = new ItemAdapter(new ArrayList<>(), R.layout.list_item, R.id.image, true);
         lRouteWayPoints.setAdapter(listAdapter, false);
-        lRouteWayPoints.setCanDragHorizontally(true);
+        lRouteWayPoints.setCanDragHorizontally(false);
+
+        lAvailableRoutes.setLayoutManager(new LinearLayoutManager(getActivity()));
+        DragItemAdapter availableRoutesListAdapter = new RouteItemAdapter(new ArrayList<>(), R.layout.list_item, R.id.image, false);
+        lAvailableRoutes.setAdapter(availableRoutesListAdapter , false);
+        lAvailableRoutes.setCanDragHorizontally(true);
+
     }
 
     private DirectionsResult getDirectionsDetails(ArrayList<RouteWayPoint> route, TravelMode mode) {
