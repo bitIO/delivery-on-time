@@ -165,6 +165,7 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         Log.d("DOT", "AddToRouteId: " + R.id.buttonAddToRoute);
         switch (buttonId) {
             case R.id.buttonListRoutes:
+                lRoutesFormCreate.setVisibility(View.GONE);
                 lRoutesListScrollView.setVisibility(View.VISIBLE);
                 firebaseData.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -190,6 +191,11 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
                     }
                 });
                 break;
+
+            case R.id.buttonNewRoute:
+                enableRouteCreation();
+                break;
+
 
             case R.id.buttonAddToRoute:
                 Log.d("DOT", "Adding address to route");
@@ -239,10 +245,6 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
                         getString(R.string.routes_form_created),
                         Toast.LENGTH_LONG
                 ).show();
-                break;
-
-            case R.id.buttonNewRoute:
-                enableRouteCreation();
                 break;
 
             default:
@@ -388,6 +390,8 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
     }
 
     private void enableRouteCreation() {
+        lRoutesFormCreate.setVisibility(View.VISIBLE);
+        lRoutesListScrollView.setVisibility(View.GONE);
         currentRoute = new Route();
         mRouteWayPoints = new ArrayList<>();
 
