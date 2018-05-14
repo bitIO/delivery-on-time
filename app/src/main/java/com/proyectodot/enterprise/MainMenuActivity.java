@@ -146,15 +146,16 @@ public class MainMenuActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            if (position == 1) {
-                return new RoutesFragment();
+            switch (position) {
+                case 1:
+                    return new RoutesFragment();
+                default:
+                    return PlaceholderFragment.newInstance(position + 1);
             }
-            return PlaceholderFragment.newInstance(position + 1);
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 5;
         }
     }
