@@ -1,10 +1,13 @@
 package com.proyectodot.enterprise;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class RouteWayPoint {
     private String address;
     private String city;
     private String province;
     private String country = "Spain";
+    private LatLng latLng;
 
     public RouteWayPoint() {
 
@@ -46,6 +49,14 @@ public class RouteWayPoint {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
     }
 
     @Override

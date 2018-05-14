@@ -28,10 +28,19 @@ public class Route {
 
                 case "waypoints":
                     ArrayList<RouteWayPoint> rwps = new ArrayList<>();
-                    ArrayList<HashMap<String, String>> wps = (ArrayList<HashMap<String, String>>)child.getValue();
+                    ArrayList<HashMap<String, Object>> wps = (ArrayList<HashMap<String, Object>>)child.getValue();
                     for (int i = 0; i < wps.size(); i++) {
-                        HashMap<String, String> data = wps.get(i);
-                        rwps.add(new RouteWayPoint(data.get("address"), data.get("city"), data.get("province")));
+                        HashMap<String, Object> data = wps.get(i);
+                        RouteWayPoint rwp = new RouteWayPoint(
+                                data.get("address").toString(),
+                                data.get("city").toString(),
+                                data.get("province").toString()
+                        );
+                        rwp.setLatLng(new LatLng(
+                                ((HashMap<String, Double>) data.get("latLng")).get("latitude"),
+                                ((HashMap<String, Double>) data.get("latLng")).get("longitude")
+                        ));
+                        rwps.add(rwp);
                     }
                     r.setWaypoints(rwps);
                     break;

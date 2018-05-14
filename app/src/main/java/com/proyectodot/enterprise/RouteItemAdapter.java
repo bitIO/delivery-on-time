@@ -14,6 +14,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 import com.woxthebox.draglistview.DragItemAdapter;
@@ -82,6 +83,10 @@ public class RouteItemAdapter extends DragItemAdapter<Pair<String, Route>, Route
             LatLngBounds.Builder bounds= new LatLngBounds.Builder();
             for(LatLng latlong: r.getPolyline()) {
                 bounds.include(latlong);
+            }
+
+            for (int i = 0; i < r.getWaypoints().size(); i++) {
+                googleMap.addMarker(new MarkerOptions().position(r.getWaypoints().get(i).getLatLng()).title("Parada " + (i + 1)));
             }
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds.build(), 50);
             googleMap.animateCamera(cu);

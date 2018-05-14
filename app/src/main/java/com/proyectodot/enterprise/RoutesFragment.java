@@ -335,7 +335,9 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
                 Log.d("DOT", "Añadiendo marcador: " + i);
                 Log.d("DOT", mRouteWayPoints.get(i).toString());
                 Address address = gCoder.getFromLocationName(mRouteWayPoints.get(i).toString(), 1).get(0);
-                mMap.addMarker(new MarkerOptions().position(new LatLng(address.getLatitude(), address.getLongitude())).title("Parada " + (i + 1)));
+                LatLng latlng = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(latlng).title("Parada " + (i + 1)));
+                mRouteWayPoints.get(i).setLatLng(latlng);
             } catch (IOException e) {
                 e.printStackTrace();
             }
