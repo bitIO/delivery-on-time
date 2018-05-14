@@ -85,6 +85,8 @@
     <string name="routes_form_create_input_city">Ciudad</string>
     <string name="routes_form_create_input_province">Provincia</string>
     <string name="routes_form_create_save_address">Añadir a ruta</string>
+    <string name="routes_form_create_saved_address">Punto de ruta añadido</string>
     <string name="routes_form_create_save">Guardar ruta</string>
+    <string name="routes_form_created">Ruta creada correctamente</string>
     <!-- END: ROUTES -->
 </resources>

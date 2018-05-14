@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,12 +56,16 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
 
 
     // form create route
+    LinearLayout lRoutesFormCreate;
     TextView tRouteName;
     TextView tAddress;
     TextView tCity;
     TextView tProvince;
     DragListView lRouteWayPoints;
     ArrayList<RouteWayPoint> mRouteWayPoints = new ArrayList<>();
+    Button bButtonSaveRoute;
+
+    Route currentRoute;
 
     public RoutesFragment() {
         // Required empty public constructor
@@ -92,15 +98,18 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         }
 
         // elements
+        lRoutesFormCreate = view.findViewById(R.id.routesFormCreate);
         tRouteName = view.findViewById(R.id.editTextName);
         tAddress = view.findViewById(R.id.editTextAddress);
         tCity= view.findViewById(R.id.editTextCity);
         tProvince= view.findViewById(R.id.editTextProvince);
+        bButtonSaveRoute = view.findViewById(R.id.buttonSaveRoute);
 
         lRouteWayPoints = view.findViewById(R.id.dragListRouteItems);
         initDragList();
 
         // listeners
+        view.findViewById(R.id.buttonNewRoute).setOnClickListener(this);
         view.findViewById(R.id.buttonAddToRoute).setOnClickListener(this);
         view.findViewById(R.id.buttonSaveRoute).setOnClickListener(this);
     }
@@ -136,16 +145,16 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         Log.d("DOT", "AddToRouteId: " + R.id.buttonAddToRoute);
         switch (buttonId) {
             case R.id.buttonAddToRoute:
-//                Log.d("DOT", "Adding address to route");
-//                String address = tAddress.getText().toString();
-//                String city = tCity.getText().toString();
-//                String province = tProvince.getText().toString();
-//                RouteWayPoint rwp = new RouteWayPoint(address, city, province);
-//                adapter.addItem(
-//                        adapter.getItemCount(),
-//                        new Pair<>(System.currentTimeMillis(), rwp.toString())
-//                );
-//                mRouteWayPoints.add(rwp);
+                Log.d("DOT", "Adding address to route");
+                String address = tAddress.getText().toString();
+                String city = tCity.getText().toString();
+                String province = tProvince.getText().toString();
+                RouteWayPoint rwp = new RouteWayPoint(address, city, province);
+                adapter.addItem(
+                        adapter.getItemCount(),
+                        new Pair<>(System.currentTimeMillis(), rwp.toString())
+                );
+                mRouteWayPoints.add(rwp);
                 if (adapter.getItemCount() >= 2) {
                     mGoogleMap.clear();
                     DirectionsResult results = getDirectionsDetails(mRouteWayPoints, TravelMode.DRIVING);
@@ -155,6 +164,12 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
                         addMarkersToMap(results, mGoogleMap);
                     }
                 }
+                Toast.makeText(
+                        getActivity(),
+                        getString(R.string.routes_form_create_saved_address),
+                        Toast.LENGTH_LONG
+                ).show();
+                resetRouteWaypointForm();
                 break;
 
             case R.id.buttonSaveRoute:
@@ -162,11 +177,24 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
                 if (adapter.getItemCount() == 0) {
                     Toast.makeText(v.getContext(), "😅 La ruta esta vacia", Toast.LENGTH_LONG).show();
                 }
-                Route route = new Route(tRouteName.getText().toString(), mRouteWayPoints);
+                currentRoute.setName(tRouteName.getText().toString());
+                currentRoute.setWaypoints(mRouteWayPoints);
+
                 // Write a message to the database
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference("routes/" + route.getName());
-                myRef.setValue(route.getWaypoints());
+                DatabaseReference firebaseData = database.getReference("routes/").push();
+                firebaseData.setValue(currentRoute);
+
+                resetRouteCreation();
+                Toast.makeText(
+                        getActivity(),
+                        getString(R.string.routes_form_created),
+                        Toast.LENGTH_LONG
+                ).show();
+                break;
+
+            case R.id.buttonNewRoute:
+                enableRouteCreation();
                 break;
 
             default:
@@ -198,35 +226,6 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         DragItemAdapter listAdapter = new ItemAdapter(new ArrayList<>(), R.layout.list_item, R.id.image, true);
         lRouteWayPoints.setAdapter(listAdapter, false);
         lRouteWayPoints.setCanDragHorizontally(true);
-
-        RouteWayPoint rwp1 = new RouteWayPoint("Avenida de Carlos V 3", "Mostoles", "Madrid");
-        RouteWayPoint rwp2 = new RouteWayPoint("Simon Hernandez 1", "Mostoles", "Madrid");
-        RouteWayPoint rwp3 = new RouteWayPoint("Luis Sauquillo 3", "Fuenlabdrada", "Madrid");
-        RouteWayPoint rwp4 = new RouteWayPoint("Urbanizacion Nuevo Versalles 30", "Fuenlabdrada", "Madrid");
-
-        DragItemAdapter adapter = lRouteWayPoints.getAdapter();
-        adapter.addItem(
-                adapter.getItemCount(),
-                new Pair<>(System.currentTimeMillis(), rwp1.toString())
-        );
-        mRouteWayPoints.add(rwp1);
-        adapter.addItem(
-                adapter.getItemCount(),
-                new Pair<>(System.currentTimeMillis(), rwp2.toString())
-        );
-        mRouteWayPoints.add(rwp2);
-        adapter.addItem(
-                adapter.getItemCount(),
-                new Pair<>(System.currentTimeMillis(), rwp3.toString())
-        );
-        mRouteWayPoints.add(rwp3);
-        adapter.addItem(
-                adapter.getItemCount(),
-                new Pair<>(System.currentTimeMillis(), rwp4.toString())
-        );
-        mRouteWayPoints.add(rwp4);
-
-
     }
 
     private DirectionsResult getDirectionsDetails(ArrayList<RouteWayPoint> route, TravelMode mode) {
@@ -280,7 +279,7 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
                 Log.d("DOT", "Añadiendo marcador: " + i);
                 Log.d("DOT", mRouteWayPoints.get(i).toString());
                 Address address = gCoder.getFromLocationName(mRouteWayPoints.get(i).toString(), 1).get(0);
-                mMap.addMarker(new MarkerOptions().position(new LatLng(address.getLatitude(), address.getLongitude())));
+                mMap.addMarker(new MarkerOptions().position(new LatLng(address.getLatitude(), address.getLongitude())).title("Parada " + (i + 1)));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -299,6 +298,7 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
 
     private void addPolyline(DirectionsResult results, GoogleMap mMap) {
         List<LatLng> decodedPath = PolyUtil.decode(results.routes[overview].overviewPolyline.getEncodedPath());
+        currentRoute.setPolyline(decodedPath);
         mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(getContext().getResources().getColor(R.color.colorPrimary)));
     }
 
@@ -331,5 +331,59 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         mUiSettings.setZoomGesturesEnabled(true);
         mUiSettings.setTiltGesturesEnabled(false);
         mUiSettings.setRotateGesturesEnabled(true);
+    }
+
+    private void enableRouteCreation() {
+        currentRoute = new Route();
+        mRouteWayPoints = new ArrayList<>();
+
+        tRouteName.setText("");
+        mGoogleMap.clear();
+        resetRouteWaypointForm();
+        lRoutesFormCreate.setVisibility(View.VISIBLE);
+    }
+
+    private void resetRouteCreation() {
+        currentRoute = null;
+        mRouteWayPoints = null;
+        lRoutesFormCreate.setVisibility(View.GONE);
+        tRouteName.setText("");
+        mGoogleMap.clear();
+        resetRouteWaypointForm();
+    }
+
+    private void resetRouteWaypointForm() {
+        tAddress.setText("");
+        tCity.setText("");
+        tProvince.setText("");
+    }
+
+    private void fixtureRouteCreation() {
+        RouteWayPoint rwp1 = new RouteWayPoint("Avenida de Carlos V 3", "Mostoles", "Madrid");
+        RouteWayPoint rwp2 = new RouteWayPoint("Simon Hernandez 1", "Mostoles", "Madrid");
+        RouteWayPoint rwp3 = new RouteWayPoint("Luis Sauquillo 3", "Fuenlabdrada", "Madrid");
+        RouteWayPoint rwp4 = new RouteWayPoint("Urbanizacion Nuevo Versalles 30", "Fuenlabdrada", "Madrid");
+
+        DragItemAdapter adapter = lRouteWayPoints.getAdapter();
+        adapter.addItem(
+                adapter.getItemCount(),
+                new Pair<>(System.currentTimeMillis(), rwp1.toString())
+        );
+        mRouteWayPoints.add(rwp1);
+        adapter.addItem(
+                adapter.getItemCount(),
+                new Pair<>(System.currentTimeMillis(), rwp2.toString())
+        );
+        mRouteWayPoints.add(rwp2);
+        adapter.addItem(
+                adapter.getItemCount(),
+                new Pair<>(System.currentTimeMillis(), rwp3.toString())
+        );
+        mRouteWayPoints.add(rwp3);
+        adapter.addItem(
+                adapter.getItemCount(),
+                new Pair<>(System.currentTimeMillis(), rwp4.toString())
+        );
+        mRouteWayPoints.add(rwp4);
     }
 }
