@@ -91,5 +91,9 @@
     <string name="routes_form_create_saved_address">Punto de ruta añadido</string>
     <string name="routes_form_create_save">Guardar ruta</string>
     <string name="routes_form_created">Ruta creada correctamente</string>
+
+    <string name="routes_dialog_remove_title">¿Eliminar ruta?</string>
+    <string name="routes_dialog_remove_message">🔥 Haciendo click en OK, se borrará la ruta: %1$s</string>
+    <string name="routes_dialog_remove_done">La ruta se ha eliminado</string>
     <!-- END: ROUTES -->
 </resources>

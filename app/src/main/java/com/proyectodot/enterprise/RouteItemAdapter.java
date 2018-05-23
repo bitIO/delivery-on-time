@@ -1,5 +1,7 @@
 package com.proyectodot.enterprise;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 import android.util.Log;
@@ -16,6 +18,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.maps.android.PolyUtil;
 import com.woxthebox.draglistview.DragItemAdapter;
 
@@ -31,6 +35,8 @@ public class RouteItemAdapter extends DragItemAdapter<Pair<String, Route>, Route
     private ArrayList<Pair<String, Route>> routesList;
     private GoogleMap googleMap;
 
+    private DatabaseReference firebaseRoutesRef;
+
     public RouteItemAdapter(ArrayList<Pair<String, Route>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
         mLayoutId = layoutId;
         mGrabHandleId = grabHandleId;
@@ -38,6 +44,10 @@ public class RouteItemAdapter extends DragItemAdapter<Pair<String, Route>, Route
         routesList = list;
 
         setItemList(list);
+    }
+
+    public void setFirebaseRoutesRef(DatabaseReference ref) {
+        this.firebaseRoutesRef = ref;
     }
 
     @NonNull
@@ -94,7 +104,29 @@ public class RouteItemAdapter extends DragItemAdapter<Pair<String, Route>, Route
 
         @Override
         public boolean onItemLongClicked(View view) {
-            Toast.makeText(view.getContext(), "Item long clicked", Toast.LENGTH_SHORT).show();
+            Route r = routesList.get(this.getPosition()).second;
+
+            new AlertDialog.Builder(view.getContext())
+                    .setTitle(view.getContext().getString(R.string.routes_dialog_remove_title))
+                    .setMessage(view.getContext().getString(R.string.routes_dialog_remove_message, r.getName()))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(
+                            android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                firebaseRoutesRef.child(r.getId()).getRef().removeValue(new DatabaseReference.CompletionListener() {
+                                    @Override
+                                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                        Toast.makeText(
+                                                view.getContext(),
+                                                view.getContext().getString(R.string.routes_dialog_remove_done),
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+                                });
+                            }})
+                    .setNegativeButton(android.R.string.no, null)
+                    .show();
             return true;
         }
     }

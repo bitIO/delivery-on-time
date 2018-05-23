@@ -65,12 +65,6 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <AutoCompleteTextView
-                    android:id="@+id/autoCompleteTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/routes_list_search" />
-
                 <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">

@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -154,6 +156,8 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
                 .bearing(0)
                 .build();
         mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(home));
+
+        getAvailableRoutes();
     }
 
 
@@ -165,31 +169,7 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         Log.d("DOT", "AddToRouteId: " + R.id.buttonAddToRoute);
         switch (buttonId) {
             case R.id.buttonListRoutes:
-                lRoutesFormCreate.setVisibility(View.GONE);
-                lRoutesListScrollView.setVisibility(View.VISIBLE);
-                firebaseData.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // get total available quest
-                        long size = dataSnapshot.getChildrenCount();
-                        DragItemAdapter availableRoutesAdapter = lAvailableRoutes.getAdapter();
-                        ((RouteItemAdapter)availableRoutesAdapter).setGoogleMap(mGoogleMap);
-
-                        while(availableRoutesAdapter != null && availableRoutesAdapter.getItemCount() > 0) {
-                            availableRoutesAdapter.removeItem(0);
-                        }
-                        availableRoutes = new ArrayList<>();
-                        int i = 0;
-                        for (Iterator it = dataSnapshot.getChildren().iterator(); it.hasNext(); i++) {
-                            Route r = Route.parse((DataSnapshot) it.next());
-                            availableRoutesAdapter.addItem(i, new Pair<>(System.currentTimeMillis(), r));
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                getAvailableRoutes();
                 break;
 
             case R.id.buttonNewRoute:
@@ -252,6 +232,34 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         }
     }
 
+    private void getAvailableRoutes() {
+        lRoutesFormCreate.setVisibility(View.GONE);
+        lRoutesListScrollView.setVisibility(View.VISIBLE);
+        firebaseData.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // get total available quest
+                DragItemAdapter availableRoutesAdapter = lAvailableRoutes.getAdapter();
+                ((RouteItemAdapter)availableRoutesAdapter).setGoogleMap(mGoogleMap);
+
+                while(availableRoutesAdapter != null && availableRoutesAdapter.getItemCount() > 0) {
+                    availableRoutesAdapter.removeItem(0);
+                }
+                availableRoutes = new ArrayList<>();
+                int i = 0;
+                for (Iterator it = dataSnapshot.getChildren().iterator(); it.hasNext(); i++) {
+                    Route r = Route.parse((DataSnapshot) it.next());
+                    availableRoutesAdapter.addItem(i, new Pair<>(System.currentTimeMillis(), r));
+                    availableRoutes.add(r);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void initDragList () {
         lRouteWayPoints.setDragListListener(new DragListView.DragListListener() {
             @Override
@@ -278,8 +286,9 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         lRouteWayPoints.setCanDragHorizontally(false);
 
         lAvailableRoutes.setLayoutManager(new LinearLayoutManager(getActivity()));
-        DragItemAdapter availableRoutesListAdapter = new RouteItemAdapter(new ArrayList<>(), R.layout.list_item, R.id.image, false);
-        lAvailableRoutes.setAdapter(availableRoutesListAdapter , false);
+        RouteItemAdapter ria = new RouteItemAdapter(new ArrayList<>(), R.layout.list_item, R.id.image, false);
+        ria.setFirebaseRoutesRef(firebaseData);
+        lAvailableRoutes.setAdapter(ria, false);
         lAvailableRoutes.setCanDragHorizontally(true);
 
     }
