@@ -164,9 +164,7 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
     @Override
     public void onClick(View v) {
         int buttonId = v.getId();
-
         Log.d("DOT", "Clicked on view: " + buttonId);
-        Log.d("DOT", "AddToRouteId: " + R.id.buttonAddToRoute);
         switch (buttonId) {
             case R.id.buttonListRoutes:
                 getAvailableRoutes();

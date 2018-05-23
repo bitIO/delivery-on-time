@@ -149,6 +149,8 @@ public class MainMenuActivity extends AppCompatActivity {
             switch (position) {
                 case 1:
                     return new RoutesFragment();
+                case 2:
+                    return new DeliverymanFragment();
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
             }

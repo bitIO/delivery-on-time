@@ -96,4 +96,17 @@
     <string name="routes_dialog_remove_message">🔥 Haciendo click en OK, se borrará la ruta: %1$s</string>
     <string name="routes_dialog_remove_done">La ruta se ha eliminado</string>
     <!-- END: ROUTES -->
+
+    <!-- START: DELIVERYMAN -->
+    <string name="deliveryman_button_create">🚐 Nuevo repartidor</string>
+    <string name="deliveryman_list_title">Repartidores en el sistema</string>
+    <string name="deliveryman_form_title">Nuevo repartidor</string>
+    <string name="deliveryman_form_hint_name">Nombre</string>
+    <string name="deliveryman_form_hint_surname">Apellidos</string>
+    <string name="deliveryman_form_hint_phone">📱Teléfono</string>
+    <string name="deliveryman_form_hint_email">📨Email</string>
+    <string name="deliveryman_form_hint_comments">📝Comentarios</string>
+    <string name="deliveryman_button_save">💾 Guardar</string>
+    <string name="deliveryman_button_saved">🤩 Repartidor creado correctamente</string>
+    <!-- END: DELIVERYMAN -->
 </resources>
