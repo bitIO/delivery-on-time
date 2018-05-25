@@ -10,6 +10,7 @@ public class DeliveryMan {
     private String phone;
     private String email;
     private String comments;
+    private String assigned;
 
     public DeliveryMan() {
     }
@@ -20,6 +21,15 @@ public class DeliveryMan {
         this.phone = phone;
         this.email = email;
         this.comments = comments;
+    }
+
+    public DeliveryMan(String name, String surname, String phone, String email, String comments, String assigned) {
+        this.name = name;
+        this.surname = surname;
+        this.phone = phone;
+        this.email = email;
+        this.comments = comments;
+        this.assigned = assigned;
     }
 
     public String getId() {
@@ -70,6 +80,14 @@ public class DeliveryMan {
         this.comments = comments;
     }
 
+    public String getAssigned() {
+        return assigned;
+    }
+
+    public void setAssigned(String route) {
+        this.assigned = route;
+    }
+
     @Override
     public String toString() {
         return name + ' ' + surname + " ("+ phone + ")";
@@ -96,6 +114,9 @@ public class DeliveryMan {
                     break;
                 case "comments":
                     instance.setComments((String)child.getValue());
+                    break;
+                case "assigned":
+                    instance.setAssigned((String)child.getValue());
                     break;
             }
         }

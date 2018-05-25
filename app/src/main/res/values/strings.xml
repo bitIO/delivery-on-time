@@ -108,5 +108,18 @@
     <string name="deliveryman_form_hint_comments">📝Comentarios</string>
     <string name="deliveryman_button_save">💾 Guardar</string>
     <string name="deliveryman_button_saved">🤩 Repartidor creado correctamente</string>
+
+    <string name="deliveryman_dialog_remove_title">¿Eliminar repartidor?</string>
+    <string name="deliveryman_dialog_remove_message">🔥 Haciendo click en OK, se borrará repartidor: %1$s</string>
+    <string name="deliveryman_dialog_remove_done">Se ha eliminado el repartidor</string>
+
+    <string name="deliveryman_toast_has_no_route">El repartidor no tiene ruta asignada</string>
+    <string name="deliveryman_toast_has_route">Mostrando ruta asignada</string>
+
+    <string name="deliveryman_text_assign_title">Rutas disponibles (sin repartidor asignado)</string>
+    <string name="deliveryman_button_assign">Asignar ruta</string>
+    <string name="deliveryman_button_assigned">Ruta asignada</string>
+
+    <string name="deliveryman_text_route_chat_title">Chat en ruta</string>
     <!-- END: DELIVERYMAN -->
 </resources>

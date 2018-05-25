@@ -14,6 +14,7 @@ public class Route {
     private String name;
     private ArrayList<RouteWayPoint> waypoints;
     private List<LatLng> polyline;
+    private String assigned;
 
     public static final Route parse(DataSnapshot snapshot) {
         Route r = new Route();
@@ -62,6 +63,9 @@ public class Route {
                     r.setPolyline(p);
                     break;
 
+                case "assigned":
+                    r.setAssigned((String)child.getValue());
+                    break;
                 default:
                     break;
             }
@@ -107,6 +111,14 @@ public class Route {
 
     public void setPolyline(List<LatLng> polyline) {
         this.polyline = polyline;
+    }
+
+    public String getAssigned() {
+        return assigned;
+    }
+
+    public void setAssigned(String assigned) {
+        this.assigned = assigned;
     }
 
     @Override
