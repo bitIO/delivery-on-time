@@ -122,5 +122,8 @@
     <string name="deliveryman_button_assigned">Ruta asignada</string>
 
     <string name="deliveryman_text_route_chat_title">Chat en ruta</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- END: DELIVERYMAN -->
 </resources>
