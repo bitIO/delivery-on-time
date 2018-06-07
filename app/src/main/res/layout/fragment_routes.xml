@@ -58,7 +58,7 @@
             android:id="@+id/routesListScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -71,9 +71,9 @@
 
                     <com.woxthebox.draglistview.DragListView
                         android:id="@+id/dragListAvailableRoutes"
-                        android:scrollbars="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"
+                        android:scrollbars="vertical" />
 
                 </ScrollView>
 
@@ -86,7 +86,7 @@
             android:id="@+id/routesFormCreate"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -132,6 +132,14 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/routes_form_create_input_province"
+                    android:inputType="textPersonName" />
+
+                <EditText
+                    android:id="@+id/editTextClientMail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/routes_form_create_input_email"
                     android:inputType="textPersonName" />
 
                 <Button

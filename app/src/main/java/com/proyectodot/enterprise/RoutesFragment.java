@@ -76,6 +76,7 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
     TextView tAddress;
     TextView tCity;
     TextView tProvince;
+    TextView tEmail;
     DragListView lRouteWayPoints;
     ArrayList<RouteWayPoint> mRouteWayPoints = new ArrayList<>();
     Button bButtonSaveRoute;
@@ -120,6 +121,7 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         tAddress = view.findViewById(R.id.editTextAddress);
         tCity= view.findViewById(R.id.editTextCity);
         tProvince= view.findViewById(R.id.editTextProvince);
+        tEmail = view.findViewById(R.id.editTextClientMail);
         bButtonSaveRoute = view.findViewById(R.id.buttonSaveRoute);
         lRouteWayPoints = view.findViewById(R.id.dragListRouteItems);
         lAvailableRoutes= view.findViewById(R.id.dragListAvailableRoutes);
@@ -179,7 +181,8 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
                 String address = tAddress.getText().toString();
                 String city = tCity.getText().toString();
                 String province = tProvince.getText().toString();
-                RouteWayPoint rwp = new RouteWayPoint(address, city, province);
+                String email = tEmail.getText().toString().replace('.', '_');
+                RouteWayPoint rwp = new RouteWayPoint(address, city, province, email);
                 routesAdapter.addItem(
                         routesAdapter.getItemCount(),
                         new Pair<>(System.currentTimeMillis(), rwp.toString())
@@ -421,34 +424,5 @@ public class RoutesFragment extends Fragment implements OnMapReadyCallback, View
         tAddress.setText("");
         tCity.setText("");
         tProvince.setText("");
-    }
-
-    private void fixtureRouteCreation() {
-        RouteWayPoint rwp1 = new RouteWayPoint("Avenida de Carlos V 3", "Mostoles", "Madrid");
-        RouteWayPoint rwp2 = new RouteWayPoint("Simon Hernandez 1", "Mostoles", "Madrid");
-        RouteWayPoint rwp3 = new RouteWayPoint("Luis Sauquillo 3", "Fuenlabdrada", "Madrid");
-        RouteWayPoint rwp4 = new RouteWayPoint("Urbanizacion Nuevo Versalles 30", "Fuenlabdrada", "Madrid");
-
-        DragItemAdapter adapter = lRouteWayPoints.getAdapter();
-        adapter.addItem(
-                adapter.getItemCount(),
-                new Pair<>(System.currentTimeMillis(), rwp1.toString())
-        );
-        mRouteWayPoints.add(rwp1);
-        adapter.addItem(
-                adapter.getItemCount(),
-                new Pair<>(System.currentTimeMillis(), rwp2.toString())
-        );
-        mRouteWayPoints.add(rwp2);
-        adapter.addItem(
-                adapter.getItemCount(),
-                new Pair<>(System.currentTimeMillis(), rwp3.toString())
-        );
-        mRouteWayPoints.add(rwp3);
-        adapter.addItem(
-                adapter.getItemCount(),
-                new Pair<>(System.currentTimeMillis(), rwp4.toString())
-        );
-        mRouteWayPoints.add(rwp4);
     }
 }

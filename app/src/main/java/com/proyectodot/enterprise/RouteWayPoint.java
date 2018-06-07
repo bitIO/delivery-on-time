@@ -6,6 +6,7 @@ public class RouteWayPoint {
     private String address;
     private String city;
     private String province;
+    private String email;
     private String country = "Spain";
     private LatLng latLng;
 
@@ -13,10 +14,11 @@ public class RouteWayPoint {
 
     }
 
-    public RouteWayPoint(String address, String city, String province) {
+    public RouteWayPoint(String address, String city, String province, String email) {
         this.address = address;
         this.city = city;
         this.province = province;
+        this.email = email;
     }
 
     public String getAddress() {
@@ -59,8 +61,16 @@ public class RouteWayPoint {
         this.latLng = latLng;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
-        return address + ", " + city + ", " + province + ", " + country ;
+        return address + ", " + city + ", " + province + ", " + country;
     }
 }

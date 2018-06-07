@@ -35,14 +35,18 @@ public class Route {
                         RouteWayPoint rwp = new RouteWayPoint(
                                 data.get("address").toString(),
                                 data.get("city").toString(),
-                                data.get("province").toString()
+                                data.get("province").toString(),
+                                data.get("email").toString()
                         );
-                        rwp.setLatLng(new LatLng(
-                                ((HashMap<String, Double>) data.get("latLng")).get("latitude"),
-                                ((HashMap<String, Double>) data.get("latLng")).get("longitude")
-                        ));
-                        rwps.add(rwp);
+                        if (data.get("latLng") != null) {
+                            rwp.setLatLng(new LatLng(
+                                    ((HashMap<String, Double>) data.get("latLng")).get("latitude"),
+                                    ((HashMap<String, Double>) data.get("latLng")).get("longitude")
+                            ));
+                            rwps.add(rwp);
+                        }
                     }
+
                     r.setWaypoints(rwps);
                     break;
 
